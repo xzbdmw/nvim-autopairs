@@ -169,6 +169,10 @@ local function is_disable()
         return true
     end
 
+    if require("config.utils").if_multicursor() then
+        return true
+    end
+
     if vim.bo.filetype == "" and api.nvim_win_get_config(0).relative ~= "" then
         -- disable for any floating window without filetype
         return true
