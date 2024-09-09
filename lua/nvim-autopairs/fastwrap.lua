@@ -148,6 +148,12 @@ M.show = function(line)
             -- vim.cmd("startinsert")
         end)
         return
+    else
+        local prev_prev_char = utils.text_cusor_line(line, col - 1, 1, 1, false)
+        if utils.is_in_table(config.mirror_chars, prev_char) then
+            vim.api.nvim_win_set_cursor(0, { row + 1, col - 1 })
+            M.show(line)
+        end
     end
     -- vim.cmd("startinsert")
 end
