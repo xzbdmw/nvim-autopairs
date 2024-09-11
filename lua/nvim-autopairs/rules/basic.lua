@@ -9,6 +9,13 @@ local function quote_creator(opt)
             :with_move(move_func())
             :with_pair(cond.not_add_quote_inside_quote())
             :with_pair(cond.do_not_have_pair_after_cursor())
+            :replace_endpair(function(opts)
+                if cond.after_text_is_char(opts.text)(opts) then
+                    return opts.rule.end_pair .. ", "
+                else
+                    return opts.rule.end_pair
+                end
+            end)
         -- if #opt.ignored_next_char > 1 then
         --     rule:with_pair(cond.not_after_regex(opt.ignored_next_char))
         -- end

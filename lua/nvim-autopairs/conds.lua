@@ -80,6 +80,18 @@ cond.after_text = function(text)
     end
 end
 
+cond.after_text_is_char = function(text)
+    local length = #text
+    ---@param opts CondOpts
+    return function(opts)
+        local str = string.sub(opts.text, opts.col + 1, opts.col + 1)
+        if str == opts.char then
+            return true
+        end
+        return false
+    end
+end
+
 cond.after_regex = function(regex, length)
     length = length or 1
     if length < 0 then
