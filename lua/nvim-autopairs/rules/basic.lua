@@ -9,7 +9,6 @@ local function quote_creator(opt)
             :with_move(move_func())
             :with_pair(cond.not_add_quote_inside_quote())
             :with_pair(cond.do_not_have_pair_after_cursor())
-
         -- if #opt.ignored_next_char > 1 then
         --     rule:with_pair(cond.not_after_regex(opt.ignored_next_char))
         -- end

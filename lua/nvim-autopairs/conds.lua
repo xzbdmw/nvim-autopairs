@@ -253,7 +253,11 @@ cond.do_not_have_pair_after_cursor = function()
     ---@param opts CondOpts
     return function(opts)
         log.debug("not_add_quote_inside_quote")
-        if utils.is_quote(opts.char) and utils.has_pair_quotes_after_cursor(opts.text, opts.col - 1) then
+        if
+            utils.is_quote(opts.char)
+            and utils.has_pair_quotes_after_cursor(opts.char, opts.text, opts.col + 1)
+            and utils.has_pair_quotes_before_cursor(opts.char, opts.text, opts.col + 1)
+        then
             return false
         end
     end

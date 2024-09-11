@@ -41,7 +41,7 @@ M.compare = function(value, text, is_regex)
     return false
 end
 
-M.has_pair_quotes_after_cursor = function(line, pos)
+M.has_pair_quotes_after_cursor = function(c, line, pos)
     -- Extract the substring starting from the cursor position
     local substring = string.sub(line, pos)
 
@@ -53,13 +53,38 @@ M.has_pair_quotes_after_cursor = function(line, pos)
         local char = substring:sub(i, i)
 
         -- Check for double quotes
-        if char == '"' then
+        if char == c then
             double_quote_count = double_quote_count + 1
         end
     end
 
     -- Check if we have a pair of double quotes
-    if double_quote_count % 2 == 0 then
+    if double_quote_count % 2 ~= 0 then
+        return true
+    else
+        return false
+    end
+end
+
+M.has_pair_quotes_before_cursor = function(c, line, pos)
+    -- Extract the substring starting from the cursor position
+    local substring = string.sub(line, 1, pos)
+
+    -- Initialize counters for single and double quotes
+    local double_quote_count = 0
+
+    -- Iterate over each character in the substring
+    for i = 1, #substring do
+        local char = substring:sub(i, i)
+
+        -- Check for double quotes
+        if char == c then
+            double_quote_count = double_quote_count + 1
+        end
+    end
+
+    -- Check if we have a pair of double quotes
+    if double_quote_count % 2 ~= 0 then
         return true
     else
         return false
