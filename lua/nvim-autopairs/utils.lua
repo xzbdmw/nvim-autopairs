@@ -1,6 +1,6 @@
 local M = {}
 local api = vim.api
-local log = require('nvim-autopairs._log')
+local log = require("nvim-autopairs._log")
 
 M.key = {
     del = "<del>",
@@ -12,7 +12,7 @@ M.key = {
     join_right = "<c-g>U<right>",
     undo_sequence = "<c-g>u",
     noundo_sequence = "<c-g>U",
-    abbr = "<c-]>"
+    abbr = "<c-]>",
 }
 
 M.set_vchar = function(text)
@@ -20,18 +20,16 @@ M.set_vchar = function(text)
     vim.v.char = text
 end
 
-
 M.is_quote = function(char)
-    return char == "'" or char == '"' or char == '`'
+    return char == "'" or char == '"' or char == "`"
 end
 
 M.is_bracket = function(char)
-    return char == "(" or char == '[' or char == '{' or char == '<'
+    return char == "(" or char == "[" or char == "{" or char == "<"
 end
 
-
 M.is_close_bracket = function(char)
-    return char == ")" or char == ']' or char == '}' or char == '>'
+    return char == ")" or char == "]" or char == "}" or char == ">"
 end
 
 M.compare = function(value, text, is_regex)
@@ -43,6 +41,30 @@ M.compare = function(value, text, is_regex)
     return false
 end
 
+M.has_pair_quotes_after_cursor = function(line, pos)
+    -- Extract the substring starting from the cursor position
+    local substring = string.sub(line, pos)
+
+    -- Initialize counters for single and double quotes
+    local double_quote_count = 0
+
+    -- Iterate over each character in the substring
+    for i = 1, #substring do
+        local char = substring:sub(i, i)
+
+        -- Check for double quotes
+        if char == '"' then
+            double_quote_count = double_quote_count + 1
+        end
+    end
+
+    -- Check if we have a pair of double quotes
+    if double_quote_count % 2 == 0 then
+        return true
+    else
+        return false
+    end
+end
 ---check cursor is inside a quote
 ---@param line string
 ---@param pos number position in line
@@ -51,19 +73,15 @@ end
 M.is_in_quotes = function(line, pos, quote_type)
     local cIndex = 0
     local result = false
-    local last_char = quote_type or ''
+    local last_char = quote_type or ""
 
     while cIndex < string.len(line) and cIndex < pos do
         cIndex = cIndex + 1
         local char = line:sub(cIndex, cIndex)
         local prev_char = line:sub(cIndex - 1, cIndex - 1)
-        if
-            result == true
-            and char == last_char
-            and prev_char ~= "\\"
-        then
+        if result == true and char == last_char and prev_char ~= "\\" then
             result = false
-            last_char = quote_type or ''
+            last_char = quote_type or ""
         elseif
             result == false
             and M.is_quote(char)
@@ -72,8 +90,8 @@ M.is_in_quotes = function(line, pos, quote_type)
             -- prefixed string in python (e.g. f'string {with_brackets}')
             and not (
                 char == "'"
-                and prev_char:match('%w')
-                and (vim.bo.filetype ~= 'python' or prev_char:match('[^frbuFRBU]'))
+                and prev_char:match("%w")
+                and (vim.bo.filetype ~= "python" or prev_char:match("[^frbuFRBU]"))
             )
         then
             last_char = quote_type or char
@@ -88,26 +106,33 @@ M.is_attached = function(bufnr)
     return check == 1
 end
 
-
 M.set_attach = function(bufnr, value)
     api.nvim_buf_set_var(bufnr or 0, "nvim-autopairs", value)
 end
 
 M.is_in_table = function(tbl, val)
-    if tbl == nil then return false end
+    if tbl == nil then
+        return false
+    end
     for _, value in pairs(tbl) do
-        if val == value then return true end
+        if val == value then
+            return true
+        end
     end
     return false
 end
 
 M.check_filetype = function(tbl, filetype)
-    if tbl == nil then return true end
+    if tbl == nil then
+        return true
+    end
     return M.is_in_table(tbl, filetype)
 end
 
 M.check_not_filetype = function(tbl, filetype)
-    if tbl == nil then return true end
+    if tbl == nil then
+        return true
+    end
     return not M.is_in_table(tbl, filetype)
 end
 
@@ -123,7 +148,7 @@ M.get_cursor = function(bufnr)
     return row - 1, col
 end
 M.text_get_line = function(bufnr, lnum)
-    return api.nvim_buf_get_lines(bufnr, lnum, lnum + 1, false)[1] or ''
+    return api.nvim_buf_get_lines(bufnr, lnum, lnum + 1, false)[1] or ""
 end
 
 M.text_get_current_line = function(bufnr)
@@ -132,7 +157,7 @@ M.text_get_current_line = function(bufnr)
 end
 
 M.repeat_key = function(key, num)
-    local text = ''
+    local text = ""
     for _ = 1, num, 1 do
         text = text .. key
     end
@@ -171,15 +196,15 @@ end
 
 M.feed = function(text, num)
     num = num or 1
-    if num < 1 then num = 1 end
-    local result = ''
+    if num < 1 then
+        num = 1
+    end
+    local result = ""
     for _ = 1, num, 1 do
         result = result .. text
     end
     log.debug("result" .. result)
-    api.nvim_feedkeys(api.nvim_replace_termcodes(
-            result, true, false, true),
-        "n", true)
+    api.nvim_feedkeys(api.nvim_replace_termcodes(result, true, false, true), "n", true)
 end
 
 M.esc = function(cmd)
@@ -187,7 +212,7 @@ M.esc = function(cmd)
 end
 
 M.is_block_wise_mode = function()
-    return vim.fn.visualmode() == ''
+    return vim.fn.visualmode() == ""
 end
 
 --- get prev_char with out key_map
