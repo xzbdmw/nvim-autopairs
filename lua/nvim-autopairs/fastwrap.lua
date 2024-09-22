@@ -114,11 +114,11 @@ M.show = function(line)
                     { pos = pos.pos - 1, key = config.before_key },
                     { pos = pos.pos + 1, key = config.after_key },
                 }
-                if pos.char == "," and char == pos.key then
+                if pos.char == "," then
                     M.move_bracket(line, pos.col, end_pair, true)
                     break
                 end
-                if pos.key == "e" and char == pos.key then
+                if pos.key == "e" and char == pos.char then
                     M.move_bracket(line, pos.col + 1, end_pair, true)
                     break
                 end
