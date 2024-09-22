@@ -1,4 +1,4 @@
-local Cond = require('nvim-autopairs.conds')
+local Cond = require("nvim-autopairs.conds")
 
 --- @class Rule
 --- @field start_pair string
@@ -24,31 +24,31 @@ local Rule = setmetatable({}, {
 function Rule.new(...)
     local params = { ... }
     local opt = {}
-    if type(params[1]) == 'table' then
+    if type(params[1]) == "table" then
         opt = params[1]
     else
         opt.start_pair = params[1]
         opt.end_pair = params[2]
-        if type(params[3]) == 'string' then
+        if type(params[3]) == "string" then
             opt.filetypes = { params[3] }
         else
             opt.filetypes = params[3]
         end
     end
-    opt = vim.tbl_extend('force', {
-        key_map         = "",
-        start_pair      = nil,
-        end_pair        = nil,
-        end_pair_func   = false,
-        filetypes       = nil,
-        not_filetypes   = nil,
-        move_cond       = nil,
-        del_cond        = {},
-        cr_cond         = {},
-        pair_cond       = {},
-        is_endwise      = false,
-        is_regex        = false,
-        is_multibyte    = false,
+    opt = vim.tbl_extend("force", {
+        key_map = "",
+        start_pair = nil,
+        end_pair = nil,
+        end_pair_func = false,
+        filetypes = nil,
+        not_filetypes = nil,
+        move_cond = nil,
+        del_cond = {},
+        cr_cond = {},
+        pair_cond = {},
+        is_endwise = false,
+        is_regex = false,
+        is_multibyte = false,
         end_pair_length = nil,
     }, opt) or {}
 
@@ -63,7 +63,7 @@ function Rule.new(...)
         if rule.filetypes then
             local ft, not_ft = {}, {}
             for _, value in pairs(rule.filetypes) do
-                if value:sub(1, 1) == '-' then
+                if value:sub(1, 1) == "-" then
                     table.insert(not_ft, value:sub(2, #value))
                 else
                     table.insert(ft, value)
@@ -81,12 +81,12 @@ end
 
 function Rule:use_regex(value, key_map)
     self.is_regex = value
-    self.key_map = key_map or ''
+    self.key_map = key_map or ""
     return self
 end
 
 function Rule:use_key(key_map)
-    self.key_map = key_map or ''
+    self.key_map = key_map or ""
     return self
 end
 
@@ -114,7 +114,7 @@ function Rule:get_map_cr(opts)
     if self.map_cr_func then
         return self.map_cr_func(opts)
     end
-    return '<c-g>u<CR><CMD>normal! ====<CR><up><end><CR>'
+    return "<c-g>u<CR><CMD>normal! ====<CR><up><end><CR>"
 end
 function Rule:replace_map_cr(value)
     self.map_cr_func = value
@@ -125,7 +125,7 @@ function Rule:get_end_pair_length(opts)
     if self.end_pair_length then
         return self.end_pair_length
     end
-    if type(opts) == 'string' then
+    if type(opts) == "string" then
         return #opts
     end
     return #self.get_end_pair(opts)
@@ -149,19 +149,25 @@ function Rule:set_end_pair_length(length)
 end
 
 function Rule:with_move(cond)
-    if self.move_cond == nil then self.move_cond = {} end
+    if self.move_cond == nil then
+        self.move_cond = {}
+    end
     table.insert(self.move_cond, cond)
     return self
 end
 
 function Rule:with_del(cond)
-    if self.del_cond == nil then self.del_cond = {} end
+    if self.del_cond == nil then
+        self.del_cond = {}
+    end
     table.insert(self.del_cond, cond)
     return self
 end
 
 function Rule:with_cr(cond)
-    if self.cr_cond == nil then self.cr_cond = {} end
+    if self.cr_cond == nil then
+        self.cr_cond = {}
+    end
     table.insert(self.cr_cond, cond)
     return self
 end
@@ -171,7 +177,9 @@ end
 ---@param pos number|nil = 1. It have higher priority to another condition
 ---@return Rule
 function Rule:with_pair(cond, pos)
-    if self.pair_cond == nil then self.pair_cond = {} end
+    if self.pair_cond == nil then
+        self.pair_cond = {}
+    end
     self.pair_cond[pos or (#self.pair_cond + 1)] = cond
     return self
 end
@@ -181,7 +189,9 @@ function Rule:only_cr(cond)
     self.pair_cond = false
     self.move_cond = false
     self.del_cond = false
-    if cond then return self:with_cr(cond) end
+    if cond then
+        return self:with_cr(cond)
+    end
     return self
 end
 
@@ -191,7 +201,7 @@ function Rule:end_wise(cond)
 end
 
 local function can_do(conds, opt)
-    if type(conds) == 'table' then
+    if type(conds) == "table" then
         for _, cond in pairs(conds) do
             local result = cond(opt)
             if result ~= nil then
@@ -199,7 +209,7 @@ local function can_do(conds, opt)
             end
         end
         return true
-    elseif type(conds) == 'function' then
+    elseif type(conds) == "function" then
         return conds(opt) == true
     end
     return false

@@ -1,11 +1,11 @@
-local npairs = require('nvim-autopairs')
-local Rule = require('nvim-autopairs.rule')
-local cond = require('nvim-autopairs.conds')
+local npairs = require("nvim-autopairs")
+local Rule = require("nvim-autopairs.rule")
+local cond = require("nvim-autopairs.conds")
 
-local log = require('nvim-autopairs._log')
+local log = require("nvim-autopairs._log")
 _G.log = log
-local utils = require('nvim-autopairs.utils')
-_G.npairs = npairs;
+local utils = require("nvim-autopairs.utils")
+_G.npairs = npairs
 
 -- use only = true to test 1 case
 -- stylua: ignore
@@ -824,7 +824,7 @@ local data = {
 
 local run_data = _G.Test_filter(data)
 
-describe('autopairs ', function()
+describe("autopairs ", function()
     _G.Test_withfile(run_data, {
         cursor_add = 0,
         before_each = function(value)
