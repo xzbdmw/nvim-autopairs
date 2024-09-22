@@ -447,7 +447,7 @@ M.autopairs_map = function(bufnr, char)
                 and rule:can_move(cond_opt)
             then
                 local end_pair = rule:get_end_pair(cond_opt)
-                local end_pair_length = rule:get_end_pair_length(end_pair)
+                local end_pair_length = 1
                 return utils.esc(utils.repeat_key(utils.key.join_right, end_pair_length))
             end
 
