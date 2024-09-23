@@ -169,10 +169,6 @@ local function is_disable()
         return true
     end
 
-    if require("config.utils").if_multicursor() then
-        return true
-    end
-
     if vim.bo.filetype == "" and api.nvim_win_get_config(0).relative ~= "" then
         -- disable for any floating window without filetype
         return true
@@ -341,10 +337,6 @@ M.on_attach = function(bufnr)
 end
 
 local autopairs_delete = function(bufnr, key)
-    -- TST = vim.uv.hrtime()
-    -- vim.schedule(function()
-    --     Time(TST, "del")
-    -- end)
     vim.g.del = true
     vim.g.neovide_cursor_animation_length = 0
     vim.defer_fn(function()
@@ -387,6 +379,42 @@ local autopairs_delete = function(bufnr, key)
         end
     end
     return utils.esc(key)
+end
+
+M.bs = function(bufnr)
+    bufnr = bufnr or api.nvim_get_current_buf()
+    local line = utils.text_get_current_line(bufnr)
+    local _, col = utils.get_cursor()
+    local rules = M.get_buf_rules(bufnr)
+    for _, rule in pairs(rules) do
+        if rule.start_pair then
+            local prev_char, next_char =
+                utils.text_cusor_line(line, col, #rule.start_pair, #rule.end_pair, rule.is_regex)
+            if
+                utils.compare(rule.start_pair, prev_char, rule.is_regex)
+                and utils.compare(rule.end_pair, next_char, rule.is_regex)
+                and rule:can_del({
+                    ts_node = M.state.ts_node,
+                    rule = rule,
+                    bufnr = bufnr,
+                    prev_char = prev_char,
+                    next_char = next_char,
+                    line = line,
+                    col = col,
+                })
+            then
+                local input = ""
+                for _ = 1, api.nvim_strwidth(rule.start_pair), 1 do
+                    input = input .. utils.key.bs
+                end
+                for _ = 1, api.nvim_strwidth(rule.end_pair), 1 do
+                    input = input .. utils.key.del
+                end
+                return "<c-g>U" .. input
+            end
+        end
+    end
+    return ""
 end
 
 M.autopairs_c_w = function(bufnr)
