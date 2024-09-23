@@ -64,7 +64,7 @@ M.show = function(line)
         for i = col + 2, #line, 1 do
             local char = line:sub(i, i)
             local char2 = line:sub(i - 1, i)
-            if string.match(char, config.pattern) or (char == " " and string.match(char2, "%w")) then
+            if string.match(char, config.pattern) then
                 local key = config.keys:sub(index, index)
                 index = index + 1
                 if
@@ -77,9 +77,9 @@ M.show = function(line)
                     offset = 0
                 end
 
-                if config.manual_position and i == str_length then
-                    key = config.end_key
-                end
+                -- if config.manual_position and i == str_length then
+                --     key = config.end_key
+                -- end
 
                 table.insert(list_pos, { col = i + offset, key = key, char = char, pos = i })
             end
@@ -109,16 +109,19 @@ M.show = function(line)
             -- get the first char
             local char = #list_pos == 1 and config.end_key or M.getchar_handler()
             vim.api.nvim_buf_clear_namespace(0, M.ns_fast_wrap, row, row + 1)
-            for _, pos in pairs(list_pos) do
+            for i, pos in pairs(list_pos) do
                 local hl_mark = {
                     { pos = pos.pos - 1, key = config.before_key },
                     { pos = pos.pos + 1, key = config.after_key },
                 }
-                if pos.char == "," then
+                if pos.char == "," and char == pos.key then
                     M.move_bracket(line, pos.col, end_pair, true)
                     break
                 end
-                if pos.key == "e" and char == pos.char then
+                -- function#if#function#for#if pos.char: ","
+                -- function#if#function#for#if pos.key: "y"
+                -- function#if#function#for#if char: "e"
+                if pos.key == "e" and char == pos.key then
                     M.move_bracket(line, pos.col + 1, end_pair, true)
                     break
                 end
@@ -128,8 +131,12 @@ M.show = function(line)
                     and pos.char ~= " "
                 then
                     if pos.char ~= end_pair then
-                        M.highlight_wrap(hl_mark, row, col, #line, whitespace_line)
-                        M.choose_pos(row, line, pos, end_pair)
+                        if #list_pos > i and list_pos[i + 1].key == "e" and pos.col == list_pos[i + 1].col then
+                            M.move_bracket(line, pos.col, end_pair, true)
+                        else
+                            M.highlight_wrap(hl_mark, row, col, #line, whitespace_line)
+                            M.choose_pos(row, line, pos, end_pair)
+                        end
                     else
                         M.move_bracket(line, pos.col + 1, end_pair, true)
                     end
