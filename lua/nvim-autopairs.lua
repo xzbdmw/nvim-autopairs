@@ -381,7 +381,26 @@ local autopairs_delete = function(bufnr, key)
     return utils.esc(key)
 end
 
+local mini_snippets_active = function()
+    local cursor = vim.api.nvim_win_get_cursor(0)
+    local extmarks =
+        vim.api.nvim_buf_get_extmarks(0, vim.api.nvim_create_namespace("MiniSnippetsNodes"), 0, -1, { details = true })
+    for _, mark in ipairs(extmarks) do
+        local detail = mark[4]
+        if detail.hl_group == "MiniSnippetsCurrentReplace" and mark[3] == cursor[2] and mark[2] + 1 == cursor[1] then
+            return true
+        end
+    end
+    return false
+end
+
 M.bs = function(bufnr)
+    if mini_snippets_active() then
+        vim.schedule(function()
+            FeedKeys("<c-g>U<right><BS>", "n")
+        end)
+        return "a<c-g>U<left>"
+    end
     bufnr = bufnr or api.nvim_get_current_buf()
     local line = utils.text_get_current_line(bufnr)
     local _, col = utils.get_cursor()

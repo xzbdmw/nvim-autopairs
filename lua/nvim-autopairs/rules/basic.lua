@@ -11,8 +11,8 @@ local function quote_creator(opt)
             :with_pair(cond.do_not_have_pair_after_cursor())
             :replace_endpair(function(opts)
                 if
-                    cond.after_text_is_char(opts.text)(opts) and opts.rule.end_pair == '"'
-                    or opts.rule.end_pair == "'"
+                    cond.after_text_is_char(opts.text)(opts)
+                    and (opts.rule.end_pair == "'" or opts.rule.end_pair == '"')
                 then
                     return opts.rule.end_pair .. ", "
                 else
